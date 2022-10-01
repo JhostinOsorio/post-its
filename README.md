@@ -12,18 +12,37 @@ Requerimients basic for start project
 Creating database
 
 ```
-CREATE DATABASE post-its;
+CREATE DATABASE `post-its`;
 ```
 ## Instalation :
 Instalation dependencies and migrations the tables and data fake
 
+Copy enviroment
 ```
 cp .env.example .env
-composer install
+```
+Install dependencies
+```
+composer install --ignore-platform-reqs
+```
+Migrate tables
+```
 php artisan migrate
+```
+Migrate data fake (Groups)
+```
 php artisan db:seed
+```
+Generate Secret for JWT (Auth)
+```
 php artisan jwt:secret
+```
+Generate symbolic link
+```
 php artisan storage:link
+```
+Run local server
+```
 php artisan serve
 ```
 
