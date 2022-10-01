@@ -37,7 +37,7 @@ class NoteController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Ocurrio un problema al listar las notas ...',
-            ], 200);
+            ], 500);
         }
     }
 
