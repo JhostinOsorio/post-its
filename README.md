@@ -32,3 +32,13 @@ Execute queue for task in second plain (send email)
 ```
 php artisan queue:work
 ```
+
+## Postman
+This is a quick guide to use the API
+
+[API Post Its](https://documenter.getpostman.com/view/12863914/2s83tDpsdC)
+
+ 1. User/Create User
+ 2. Auth/Login
+ 3. User/Assign Group
+ 4. Etc...
