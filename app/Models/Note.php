@@ -13,6 +13,12 @@ class Note extends Model
         'user_id',
         'title',
         'description',
+        'filename',
         'path_image',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);;
+    }
 }

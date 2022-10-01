@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('title', 50);
             $table->string('description', 255)->nullable();
+            $table->string('filename', 50)->nullable();
             $table->string('path_image', 100)->nullable();
             $table->timestamps();
         });

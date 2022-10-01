@@ -2,8 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\SendEmailJob;
+use App\Mail\NotifyCallReceived;
 use App\Models\Note;
+use App\Models\User;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -54,12 +60,16 @@ class NoteController extends Controller
             $note->user_id = auth()->user()->id;
             $note->title = $request->get('title');
             $note->description = $request->get('description');
+            $filename = $request->get('filename');
+            $imgBase64 = $request->get('imgBase64');
+            if ($imgBase64 && $filename) {
+                Storage::disk('public')->put($filename, base64_decode($imgBase64));
+                $note->filename = $filename;
+                $note->path_image = Storage::url($filename);
+            }
             $response = $note->save();
             if ($response) {
-                return response()->json([
-                    'success' => true,
-                    'message' => 'La nota se registro con éxito ...',
-                ], 200);
+                return $this->sendEmail($note);
             } else {
                 return response()->json([
                     'success' => false,
@@ -82,6 +92,7 @@ class NoteController extends Controller
             $filename = $request->get('filename');
             Storage::disk('public')->put($filename, base64_decode($imgBase64));
             $note = Note::findOrFail($noteId);
+            $note->filename = $filename;
             $note->path_image = Storage::url($filename);
             $response = $note->save();
             if ($response) {
@@ -98,10 +109,36 @@ class NoteController extends Controller
                     'message' => 'Ocurrio un problema al subir la imágen ...',
                 ], 200);
             }
-        } catch (QueryException $e) {
+        } catch (Exception $e) {
+            if ($e instanceof ModelNotFoundException) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'La nota a la que desea añadir una imágen, no existe',
+                ], 404);
+            }
             return response()->json([
                 'success' => false,
                 'message' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
+    protected function sendEmail(Note $note)
+    {
+        try {
+            $groupId = auth()->user()->group_id;
+            $users = User::where('group_id', $groupId)->get();
+            foreach ($users as $user) {
+                dispatch(new SendEmailJob($user, $note));
+            }
+            return response()->json([
+                'success' => true,
+                'message' => 'La nota se registro con éxito ...',
+            ], 200);
+        } catch (Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La nota se registro con éxito, pero ocurrio un error al momento de enviar los correos ' . $e->getMessage(),
             ], 500);
         }
     }
