@@ -25,6 +25,19 @@ Install dependencies
 ```
 composer install --ignore-platform-reqs
 ```
+Generate Key
+```
+php artisan key:generate
+```
+Verify file .env
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=post-its
+DB_USERNAME=root
+DB_PASSWORD=
+```
 Migrate tables
 ```
 php artisan migrate
