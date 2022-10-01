@@ -42,8 +42,18 @@ class UserController extends Controller
             $groupId = $request->get('groupId');
             $user = User::find($userId);
             $user->group_id = $groupId;
-            $user->save();
-            return $user;
+            $response = $user->save();
+            if ($response) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'El usuario se unio a un grupo con éxito ...',
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ocurrio un problema al unir al usuario a un grupo ...',
+                ], 200);
+            }
         } catch (QueryException $e) {
             return response()->json([
                 'success' => false,
